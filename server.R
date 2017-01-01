@@ -2,7 +2,7 @@ server <- function(input, output, session) {
 
 
 
-    loading2 <- eventReactive(input$dictionartButton,{
+    loading <- eventReactive(input$dictionartButton,{
         library(tm)
         library(RWeka)
         library(stringr)
@@ -13,7 +13,7 @@ server <- function(input, output, session) {
         
         # Load the twitter dataset
         EN_twitter_file <- "en_US/en_US.twitter.txt"
-        EN_twitter <-  readLines(EN_twitter_file)
+        EN_twitter <-  readLines(EN_twitter_file, n=400000)
         
         ##Remove punctuation 
         EN_twitter <- gsub("[[:punct:]]", "", EN_twitter) 
@@ -21,7 +21,7 @@ server <- function(input, output, session) {
         EN_twitter <- tolower(EN_twitter)
         
         ##Get a sample dataset
-        EN_twitter_sample <- sample(EN_twitter, length(EN_twitter)*0.005, replace = FALSE, prob = NULL)
+        EN_twitter_sample <- sample(EN_twitter, length(EN_twitter)*0.0005, replace = FALSE, prob = NULL)
         
         ##Create the corpus
         corpus <- Corpus(VectorSource(EN_twitter_sample))
@@ -61,18 +61,6 @@ server <- function(input, output, session) {
     })
     
     prediction <- eventReactive(input$submitButton,{
-        if(is.na(corpus) ){
-            paste("Dictionary is not yet loaded" )
-            
-        } else {
-                
-         ## Load the necessary libraries
-        library(tm)
-        library(RWeka)
-        library(stringr)
-        library(dplyr)
-        library(tidyr)
-        
         ## Read input sentence 
         inputText <- input$inputSentence
         
@@ -135,7 +123,7 @@ server <- function(input, output, session) {
 
         updateTextInput(session, "inputSentence", value=paste(input$inputSentence,predictedWord ))
         paste(predictedWord)
-        }
+        
 
     })
     
@@ -147,7 +135,7 @@ server <- function(input, output, session) {
     
     
 
-    output$textLoadReady <- loading2
+    output$textLoadReady <- loading
     output$text2 <- selection1
     output$text1 <- prediction
     
